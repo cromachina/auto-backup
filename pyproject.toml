@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "auto-backup"
+version = "1.0.0"
+description = ""
+license = "MIT"
+authors = ["cromachina"]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+watchdog = "*"
+schedule = "*"
+
+[tool.poetry.scripts]
+auto-backup = "auto_backup:main"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
