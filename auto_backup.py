@@ -80,9 +80,9 @@ class EventHandler(FileSystemEventHandler):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--old-file-limit-days', type=lambda s: timedelta(days=float(float(s))), default=7)
-    parser.add_argument('--remove-by-time', type=bool, default=False)
+    parser.add_argument('--remove-by-time', default=False, action=argparse.BooleanOptionalAction)
     parser.add_argument('--backup-limit', type=int, default=6)
-    parser.add_argument('--recursive', type=bool, default=True)
+    parser.add_argument('--recursive', default=True, action=argparse.BooleanOptionalAction)
     parser.add_argument('--scan-directory', type=Path, default='/home/cro/aux/art')
     parser.add_argument('--backup-directory', type=Path, default='/home/cro/aux/backups')
     parser.add_argument('--file-match', type=re.compile, default='.*\\.sai2')
