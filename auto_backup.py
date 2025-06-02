@@ -39,7 +39,7 @@ def get_backup_root(config, src_path:Path):
     return config.backup_directory / src_path.relative_to(config.scan_directory).parent
 
 def remove_backups_by_count(config, src_path:Path):
-    matcher = re.compile(f'{src_path.stem}\\.\\d+\\.*')
+    matcher = re.compile(f'{src_path.stem}\\.\\d+\\{src_path.suffix}')
     sub_backup_dir = get_backup_root(config, src_path)
     files = os.listdir(sub_backup_dir)
     files = [file for file in files if matcher.match(file)]
