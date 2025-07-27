@@ -2,30 +2,45 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
-    poetry2nix.url = "github:nix-community/poetry2nix";
   };
   outputs = {
-    self,
     nixpkgs,
     flake-utils,
-    poetry2nix,
+    ...
   }:
-  flake-utils.lib.eachDefaultSystem (
-    system:
+  flake-utils.lib.eachDefaultSystem (system:
     let
       pkgs = nixpkgs.legacyPackages.${system};
-      inherit (poetry2nix.lib.mkPoetry2Nix { inherit pkgs; }) mkPoetryApplication mkPoetryEnv;
-      config = {
-        projectDir = self;
-        preferWheels = true;
+      lib = pkgs.lib;
+      pyPkgs = pkgs.python313Packages;
+      pyproject = builtins.fromTOML (builtins.readFile ./pyproject.toml);
+      project = pyproject.project;
+      fixString = x: lib.strings.toLower (builtins.replaceStrings ["_"] ["-"] x);
+      getPkgs = x: lib.attrsets.attrVals (builtins.map fixString x) pyPkgs;
+      package = pyPkgs.buildPythonPackage {
+        pname = project.name;
+        version = project.version;
+        format = "pyproject";
+        src = ./.;
+        build-system = getPkgs pyproject.build-system.requires;
+        dependencies = getPkgs project.dependencies ++ [ pkgs.ffmpeg-full ];
+      };
+      editablePackage = pyPkgs.mkPythonEditablePackage {
+        pname = project.name;
+        version = project.version;
+        scripts = project.scripts;
+        root = "$PWD/src";
       };
     in
     {
-      packages.default = mkPoetryApplication config;
-      devShells.default = pkgs.mkShellNoCC {
-        packages = with pkgs; [
-          poetry
-          (mkPoetryEnv config)
+      packages.default = pyPkgs.toPythonApplication package;
+      devShells.default = pkgs.mkShell {
+        inputsFrom = [
+          package
+        ];
+        buildInputs = [
+          editablePackage
+          pyPkgs.build
         ];
       };
     }

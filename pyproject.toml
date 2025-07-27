@@ -1,18 +1,23 @@
-[tool.poetry]
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
 name = "auto-backup"
 version = "1.0.0"
-description = ""
-license = "MIT"
-authors = ["cromachina"]
+authors = [
+    { name = "cromachina" }
+]
+license = { text = "MIT" }
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "watchdog",
+    "schedule",
+]
 
-[tool.poetry.dependencies]
-python = "^3.12"
-watchdog = "*"
-schedule = "*"
+[project.urls]
+"Homepage" = "https://github.com/cromachina/auto-backup"
 
-[tool.poetry.scripts]
+[project.scripts]
 auto-backup = "auto_backup:main"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
